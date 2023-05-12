@@ -1,0 +1,4 @@
+{
+    "connection_string": "root:mysecretpw@tcp(test-mysql:3306)/crud-memo",
+    "port": 8050
+}
