@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/spf13/viper"
@@ -11,19 +12,27 @@ type Config struct {
 	ConnectionString string `mapstructure:"connection_string"`
 }
 
-var AppConfig *Config
+var AppConfig Config
 
 func LoadAppConfig() {
 	log.Println("Loading server configurations...")
-	viper.AddConfigPath(".")
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
-	err := viper.ReadInConfig()
-	if err != nil {
+	viper.AddConfigPath(".")
+	viper.AutomaticEnv()
+
+	if err := viper.ReadInConfig(); err != nil {
 		log.Fatal(err)
 	}
-	err = viper.Unmarshal(&AppConfig)
-	if err != nil {
+
+	if err := viper.Unmarshal(&AppConfig); err != nil {
 		log.Fatal(err)
+	}
+
+	if AppConfig.Port == "" {
+		AppConfig.Port = "8080"
+	}
+	if AppConfig.ConnectionString == "" {
+		log.Fatal(fmt.Errorf("connection_string must be configured"))
 	}
 }

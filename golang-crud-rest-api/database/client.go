@@ -10,17 +10,18 @@ import (
 )
 
 var Instance *gorm.DB
-var err error
 
 func Connect(connectionString string) {
-	Instance, err = gorm.Open(mysql.Open(connectionString), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(connectionString), &gorm.Config{})
 	if err != nil {
-		log.Fatal(err)
-		panic("Cannot connect to DB")
+		log.Fatalf("cannot connect to DB: %v", err)
 	}
+	Instance = db
 }
 
 func Migrate() {
-	Instance.AutoMigrate(&entities.Product{})
-	log.Println("Database Migration Completed...")
+	if err := Instance.AutoMigrate(&entities.Product{}); err != nil {
+		log.Fatalf("database migration failed: %v", err)
+	}
+	log.Println("Database migration completed")
 }
